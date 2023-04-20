@@ -1,11 +1,4 @@
-// Obtener elementos del DOM
-const metrosInput = document.getElementById('metros-input');
-const calidadSelect = document.getElementById('calidad-select');
-const presupuestoInput = document.getElementById('presupuesto-input');
-const submitBtn = document.getElementById('submit-btn');
-const resultadoDiv = document.getElementById('resultado');
-
-// Definir objetos para las calidades de construcción
+// Se definen objetos para las calidades de construccion
 class Material {
     constructor(nombre, calidad, costoPorMetroCuadrado) {
         this.nombre = nombre;
@@ -13,44 +6,45 @@ class Material {
         this.costoPorMetroCuadrado = costoPorMetroCuadrado;
     }
 }
+
 const materiales = [
     new Material("Basica", 1, 5000),
     new Material("Media", 2, 8000),
     new Material("Alta", 3, 12000),
 ];
 
-// Función para obtener la calidad de los materiales seleccionada por el usuario
-function obtenerCalidadMateriales() {
-    const calidad = parseInt(calidadSelect.value);
-    const materialSeleccionado = materiales.find((material) => material.calidad === calidad);
-    resultadoDiv.innerHTML += `<p>Seleccionaste la calidad "${materialSeleccionado.nombre}"</p>`;
-    return materialSeleccionado;
-}
+// Se seleccionan los elementos del formulario
+const metrosCuadrados = document.getElementById("metros-cuadrados");
+const calidadMateriales = document.getElementById("calidad-materiales");
+const presupuesto = document.getElementById("presupuesto");
+const resultado = document.getElementById("resultado");
+const mensaje = document.getElementById("mensaje");
+const detalle = document.getElementById("detalle");
 
-// Función para calcular el costo de la construcción y mostrar el resultado
+// Se define la función para calcular el costo total
 function calcularCosto() {
-    const metros = parseInt(metrosInput.value);
-    const material = obtenerCalidadMateriales();
-    const presupuesto = parseInt(presupuestoInput.value);
+    const metros = parseInt(metrosCuadrados.value);
+    const calidad = parseInt(calidadMateriales.value);
+    const dinero = parseInt(presupuesto.value);
 
-    let costoTotal = metros * material.costoPorMetroCuadrado;
-    resultadoDiv.innerHTML += `<p>El costo de construir tu casa sera de: $${costoTotal}</p>`;
+    const materialSeleccionado = materiales.find(material => material.calidad === calidad);
+    const costoMaterial = materialSeleccionado.costoPorMetroCuadrado;
+    const costoTotal = metros * costoMaterial;
 
-    // Evaluar si al usuario le alcanza o no el presupuesto para construir lo que desea
-    if (costoTotal > presupuesto) {
-        let calidadNueva = material.calidad - 1;
-        const materialesDisponibles = materiales.filter((material) => material.calidad <= calidadNueva);
-        const materialSeleccionado = materialesDisponibles[materialesDisponibles.length - 1];
-        let metrosNuevos = Math.floor(presupuesto / materialSeleccionado.costoPorMetroCuadrado);
-        costoTotal = metrosNuevos * materialSeleccionado.costoPorMetroCuadrado;
-        resultadoDiv.innerHTML += `<p>No tenes suficiente presupuesto para construir con la calidad de materiales seleccionada. Podes construir una casa de ${metrosNuevos} metros cuadrados con calidad ${materialSeleccionado.nombre} por un costo de $${costoTotal}.</p>`;
+    if (costoTotal > dinero) {
+        mensaje.innerText = "Lo sentimos, no tienes suficiente dinero para construir";
+        detalle.innerText = `Necesitas $${costoTotal - dinero} pesos más.`;
     } else {
-        resultadoDiv.innerHTML += `<p>Podes construir tu casa de ${metros} metros cuadrados con calidad ${material.nombre} por un costo de $${costoTotal}.</p>`;
+        mensaje.innerText = "¡Felicidades! Puedes construir tu casa";
+        detalle.innerText = `El costo total de los materiales será de $${costoTotal} pesos.`;
     }
+
+    resultado.classList.remove("d-none");
 }
 
-// Asignar la función calcularCosto al evento click del botón submit
-submitBtn.onclick = () => {
-    resultadoDiv.innerHTML = '';
+// Se agrega el evento submit al formulario
+const form = document.querySelector("form");
+form.addEventListener("submit", function (event) {
+    event.preventDefault();
     calcularCosto();
-};
+});
