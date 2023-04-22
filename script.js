@@ -21,7 +21,7 @@ const resultado = document.getElementById("resultado");
 const mensaje = document.getElementById("mensaje");
 const detalle = document.getElementById("detalle");
 
-// Se define la función para calcular el costo total
+// Se define la función para calcular el costo total y guardar el proyecto
 function calcularCosto() {
     const metros = parseInt(metrosCuadrados.value);
     const calidad = parseInt(calidadMateriales.value);
@@ -30,6 +30,16 @@ function calcularCosto() {
     const materialSeleccionado = materiales.find(material => material.calidad === calidad);
     const costoMaterial = materialSeleccionado.costoPorMetroCuadrado;
     const costoTotal = metros * costoMaterial;
+
+    const proyecto = {
+        metros: metros,
+        calidad: calidad,
+        presupuesto: dinero,
+        costoTotal: costoTotal
+    };
+
+    // Guardar el proyecto en el almacenamiento local
+    localStorage.setItem("proyecto", JSON.stringify(proyecto));
 
     if (costoTotal > dinero) {
         mensaje.innerText = "Lo sentimos, no tienes suficiente dinero para construir";
@@ -47,4 +57,22 @@ const form = document.querySelector("form");
 form.addEventListener("submit", function (event) {
     event.preventDefault();
     calcularCosto();
+});
+
+// Recuperar el proyecto guardado al cargar la página
+document.addEventListener("DOMContentLoaded", function () {
+    const proyectoGuardado = localStorage.getItem("proyecto");
+    if (proyectoGuardado) {
+        const proyecto = JSON.parse(proyectoGuardado);
+        const metros = proyecto.metros;
+        const calidad = proyecto.calidad;
+        const dinero = proyecto.presupuesto;
+        const costoTotal = proyecto.costoTotal;
+
+        metrosCuadrados.value = metros;
+        calidadMateriales.value = calidad;
+        presupuesto.value = dinero;
+
+        calcularCosto();
+    }
 });
